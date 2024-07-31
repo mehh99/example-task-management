@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task List</title>
+</head>
+<body>
+    <h1>Task List</h1>
+    <ul id="task-list"></ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const token = localStorage.getItem('access_token');
+
+            if (!token) {
+                window.location.href = '/login/';  // Redirect ke halaman login jika token tidak ada
+                return;
+            }
+
+            const response = await fetch('http://127.0.0.1:8000/api/tasks/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`  // Sertakan token dalam header Authorization
+                }
+            });
+
+            if (response.ok) {
+                const tasks = await response.json();
+                const taskList = document.getElementById('task-list');
+
+                tasks.forEach(task => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${task.title}: ${task.description}`;
+                    taskList.appendChild(listItem);
+                });
+            } else {
+                console.error('Failed to fetch tasks', response.statusText);
+                // Tambahkan penanganan kesalahan jika diperlukan
+            }
+        });
+    </script>
+</body>
+</html>
